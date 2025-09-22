@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
+// ✅ Your backend (Render) URL
+const API = "https://contact-book-app-i1yg.onrender.com";
+
 function App() {
   const [contacts, setContacts] = useState([]);
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
@@ -8,11 +11,12 @@ function App() {
   const [total, setTotal] = useState(0);
   const limit = 5;
 
+  // Fetch contacts
   useEffect(() => {
     const loadContacts = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/contacts?page=${page}&limit=${limit}`
+          `${API}/contacts?page=${page}&limit=${limit}`
         );
         setContacts(res.data.contacts);
         setTotal(res.data.total);
@@ -24,6 +28,7 @@ function App() {
     loadContacts();
   }, [page]);
 
+  // Add contact
   const addContact = async (e) => {
     e.preventDefault();
     if (!/\S+@\S+\.\S+/.test(form.email) || !/^\d{10}$/.test(form.phone)) {
@@ -31,18 +36,19 @@ function App() {
       return;
     }
     try {
-      await axios.post("http://localhost:5000/contacts", form);
+      await axios.post(`${API}/contacts`, form);
       setForm({ name: "", email: "", phone: "" });
-      setPage(1);
+      setPage(1); // reload first page
     } catch (err) {
       console.error(err);
       alert("Failed to add contact");
     }
   };
 
+  // Delete contact
   const deleteContact = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/contacts/${id}`);
+      await axios.delete(`${API}/contacts/${id}`);
       setContacts((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error(err);
